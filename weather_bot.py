@@ -1,10 +1,11 @@
 import requests
 import datetime
 import random
-import sys
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+from aiogram.utils.helper import Helper, HelperMode, ListItem
+
 
 bot = Bot(token='1980859217:AAHKffL93dOcN_XdJA89Dqf2YgxFPb14__Q')
 open_weather_token = '73bfc1f783f8b62876dc954705fa8475'
@@ -12,13 +13,11 @@ dp = Dispatcher(bot)
 
 # /start
 @dp.message_handler(commands=['start'])
-async def weather_command(message: types.Message):
+async def start_command(message: types.Message):
     await message.reply("Hello!")
 
-# ВАРИАНТЫ
-answer = ["иди нахуй", "да нахуй иди", "да, господин?", "дороу, дороу"]
-
 # ОТВЕТ
+answer = ["иди нахуй", "да нахуй иди", "да, господин?", "дороу, дороу"]
 @dp.message_handler(regexp='дороу')
 #@bot.message_handler(regexp='драсти')
 async def otvet(message: types.Message):
@@ -53,14 +52,8 @@ async def weather_command(message: types.Message):
                 f'Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст.\nВетер: {wind} м/c\n'
                 f'Хорошего дня, ебать'
             )
-
-            
         except Exception as ex:
             await message.reply('Городом ошибся')
-    
-        
-    
+
 if __name__ == '__main__':
     executor.start_polling(dp)
-
-sys.exit()
