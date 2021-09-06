@@ -1,10 +1,10 @@
 import requests
 import datetime
-import random
+#import random
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-from aiogram.utils.helper import Helper, HelperMode, ListItem
+#from aiogram.utils.helper import Helper, HelperMode, ListItem
 
 bot = Bot(token='1979372262:AAF9Qpx-2CY3do3iG8isMr_pTvBsnmO2qQ8')
 open_weather_token = '73bfc1f783f8b62876dc954705fa8475'
@@ -36,20 +36,14 @@ async def weather_command(message: types.Message):
             wind = data['wind']['speed']
             date = datetime.datetime.now().strftime('%Y-%m-%d')
 
-            await message.reply(
+            return await message.reply(
                 f'***Погода на {date}***\n'
                 f'Погода в городе: {city}\nТемпература: {cur_weather}C\nОщущается как: {feels_like}C\n'
                 f'Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст.\nВетер: {wind} м/c\n'
                 f'Хорошего дня, ебать'
             )
-
-
         except Exception as ex:
-            await message.reply('Городом ошибся')
-
-    #if __name__ == '__main__':
-        get_weather()
+            return await message.reply('Городом ошибся')
 
 if __name__ == '__main__':
     executor.start_polling(dp)
-#    weather_command()

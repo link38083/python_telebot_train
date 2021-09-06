@@ -19,11 +19,12 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
     await message.reply('Город введи')
+
     @dp.message_handler()
     async def get_weather(message: types.Message):
         try:
             r = requests.get(
-                f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric"
+                f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={open_weather_token}&units=metric"
             )
             data = r.json()
 
@@ -35,14 +36,14 @@ async def weather_command(message: types.Message):
             wind = data['wind']['speed']
             date = datetime.datetime.now().strftime('%Y-%m-%d')
 
-            await message.reply(
+            return await message.reply(
                 f'***Погода на {date}***\n'
                 f'Погода в городе: {city}\nТемпература: {cur_weather}C\nОщущается как: {feels_like}C\n'
                 f'Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст.\nВетер: {wind} м/c\n'
                 f'Хорошего дня, ебать'
             )
         except Exception as ex:
-            await message.reply('Городом ошибся')
+            return await message.reply('Городом ошибся')
 
 if __name__ == '__main__':
     executor.start_polling(dp)
