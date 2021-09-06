@@ -1,10 +1,10 @@
 import requests
 import datetime
-import random
+#import random
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-from aiogram.utils.helper import Helper, HelperMode, ListItem
+#from aiogram.utils.helper import Helper, HelperMode, ListItem
 
 bot = Bot(token='1979372262:AAF9Qpx-2CY3do3iG8isMr_pTvBsnmO2qQ8')
 open_weather_token = '73bfc1f783f8b62876dc954705fa8475'
@@ -16,31 +16,14 @@ async def start_command(message: types.Message):
     await message.reply("Hello!")
 
 # /weather
-class TestStates(Helper):
-    mode = HelperMode.snake_case
-
-    STATE_1 = 'москва'
-    STATE_2 = ListItem()
-    STATE_3 = ListItem()
-
-@dp.message_handler(state='*', commands=['weather'])
+@dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
-#    await message.reply('Город введи')
-    argument = message.get_args()
-    state = dp.current_state(user=message.from_user.id)
-    if not argument:
-        await state.reset_state()
-        return await message.reply(MESSAGES['state_reset'])
-    await state.set_state(TestStates.all()[str(argument)])
-
-#    @dp.message_handler()
-#    async def get_weather(message: types.Message):
-
-    @dp.message_handler(state=TestStates.STATE_1)
-    async def moscow_weather(message: types.Message):
+    await message.reply('Город введи')
+    @dp.message_handler()
+    async def get_weather(message: types.Message):
         try:
             r = requests.get(
-                f"http://api.openweathermap.org/data/2.5/weather?q=moscow&appid={open_weather_token}&units=metric"
+                f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric"
             )
             data = r.json()
 
