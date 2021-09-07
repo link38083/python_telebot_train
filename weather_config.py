@@ -1,7 +1,7 @@
 import requests
 import datetime
 
-open_weather_token = '73bfc1f783f8b62876dc954705fa8475'
+open_weather_token = os.getenv("WEATHERTOKEN")
 
 def get_weather(city, open_weather_token):
     try:

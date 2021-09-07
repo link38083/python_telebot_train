@@ -10,7 +10,7 @@ logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
 
 # INIT BOT
-bot = telebot.TeleBot('1980859217:AAEJiw0rhDJN4kcaRfV2ebcUSPZVcKKIyxA')
+bot = telebot.TeleBot()
 
 # /start
 @bot.message_handler(commands=['start'])
