@@ -39,6 +39,16 @@ async def weather_command(message: types.Message):
         "Snow": "Снег \U0001F328",
         "Mist": "Туман \U0001F32B"
     }
+    code_to_wind_degree = {
+        "North": "\U00002806 Северный",
+        "North-East": "\U00002197 Северо-восточный",
+        "East": "\U000027A1 Восточный",
+        "South-East": "\U00002198 Юго-восточный",
+        "South": "\U00002B07 Южный",
+        "South-West": "\U00002199 Юго-западный",
+        "West": "\U00002B05 Западный",
+        "North-West": "\U00002196 Северо-западный"
+    }
     try:
         r = requests.get(
             f"http://api.openweathermap.org/data/2.5/weather?q={text_without_command}&appid={open_weather_token}&units=metric"
@@ -56,12 +66,30 @@ async def weather_command(message: types.Message):
         humidity = data['main']['humidity']
         pressure = data['main']['pressure']/1.333
         wind = data['wind']['speed']
+        wind_degree = data['wind']['deg']
+#        for wind_degree in code_to_wind_degree:
+        if ((wind_degree>=338)and(wind_degree<=360))or((wind_degree>=0)and(wind_degree>=22)):
+            wind_de = code_to_wind_degree['North']
+        if (wind_degree>=23)and(wind_degree<=67):
+            wind_de = code_to_wind_degree['North-East']
+        if (wind_degree>=68)and(wind_degree<=112):
+            wind_de = code_to_wind_degree['East']
+        if (wind_degree>=113)and(wind_degree<=157):
+            wind_de = code_to_wind_degree['South-East']
+        if (wind_degree>=158)and(wind_degree<=202):
+            wind_de = code_to_wind_degree['South']
+        if (wind_degree>=203)and(wind_degree<=247):
+            wind_de = code_to_wind_degree['South-West']
+        if (wind_degree>=248)and(wind_degree<=292):
+            wind_de = code_to_wind_degree['West']
+        if (wind_degree>=293)and(wind_degree<=337):
+            wind_de = code_to_wind_degree['North-West']
         date = datetime.datetime.now().strftime('%Y-%m-%d')
 
         return await message.reply(
             f'***Погода на {date}***\n'
             f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n'
-            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind} м/c\n'
+            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind} м/c {wind_de}\n'
             f'Хорошего дня, ебать'
         )
     except Exception as ex:
