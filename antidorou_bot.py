@@ -5,7 +5,7 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 
 bot_token = os.getenv("ANTIDOROU")
-bot = Bot(str(bot_token))
+bot = Bot(bot_token)
 dp = Dispatcher(bot)
 
 # ОТВЕТ

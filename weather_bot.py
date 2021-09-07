@@ -21,9 +21,9 @@ async def start_command(message: types.Message):
 # /help
 @dp.message_handler(commands=['help'])
 async def help_command(message: types.Message):
-    await message.reply("Данный бот выдает погоду в любом городе.\n"
-                        "Введи текст в формате /weather *город*."
-        )
+    await message.reply(f"Данный бот выдает погоду в любом городе.\n"
+                        f"Введи текст в формате /weather *город*."
+                       )
 
 # /weather
 @dp.message_handler(commands=['weather'])
