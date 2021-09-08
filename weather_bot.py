@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 import datetime
 #import random
@@ -6,6 +7,9 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 #from aiogram.utils.helper import Helper, HelperMode, ListItem
+
+#logging
+logging.basicConfig(level=logging.INFO)
 
 # BOT
 bot_token = os.getenv("TELETOKEN")

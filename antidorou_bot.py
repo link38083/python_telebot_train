@@ -1,8 +1,12 @@
 import os
+import logging
 import random
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+
+#logging
+logging.basicConfig(level=logging.INFO)
 
 bot_token = os.getenv("ANTIDOROU")
 bot = Bot(bot_token)

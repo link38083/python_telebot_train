@@ -1,5 +1,5 @@
 import os
-import requests
+import logging
 import datetime
 #import random
 from aiogram import Bot, types
@@ -9,6 +9,9 @@ from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher.filters import Text
+
+#logging
+logging.basicConfig(level=logging.INFO)
 
 # BOT
 bot_token = os.getenv("TEST_BOT")
@@ -50,7 +53,7 @@ async def callback_title(callback_query: types.CallbackQuery):
     if callback_query.data == 'title_post':
         msg = 'Введи текст заголовка:'
 #        query = update.callback_query
-        await callback_query.answer(msg)
+        await callback_query.answer('Введи текст заголовка:')
 
 
 if __name__ == '__main__':
