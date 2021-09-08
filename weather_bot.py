@@ -16,14 +16,16 @@ dp = Dispatcher(bot)
 # /start
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.reply("Hello!")
-
-# /help
-@dp.message_handler(commands=['help'])
-async def help_command(message: types.Message):
     await message.reply(f"Данный бот выдает погоду в любом городе.\n"
                         f"Введи текст в формате /weather *город*."
-                       )
+                        )
+
+# /help
+#@dp.message_handler(commands=['help'])
+#async def help_command(message: types.Message):
+#    await message.reply(f"Данный бот выдает погоду в любом городе.\n"
+#                        f"Введи текст в формате /weather *город*."
+#                       )
 
 # /weather
 @dp.message_handler(commands=['weather'])
