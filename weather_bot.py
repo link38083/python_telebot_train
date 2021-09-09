@@ -35,6 +35,8 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
     text = message.text
+    if text == "/weather":
+        await message.reply(f'Введи город, ска')
     command, text_without_command = text.split(None, maxsplit=1)
     city_dict = {
         "спб": "Санкт-Петербург",
@@ -43,7 +45,9 @@ async def weather_command(message: types.Message):
         "московия": "Москва",
         "нерезиновая": "Москва",
     }
-    city_dicted = city_dict.get(text_without_command)
+    city_dicted = city_dict.get(text_without_command, text_without_command)
+    no_city_dict = { Null: "no_city"}
+    no_city_dicted = no_city_dict.get(text_without_command, city_dicted)
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
