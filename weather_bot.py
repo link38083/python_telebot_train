@@ -36,7 +36,7 @@ async def start_command(message: types.Message):
 async def weather_command(message: types.Message):
     text = message.text
     if text == "/weather":
-        await message.reply(f'Введи город, ска')
+        await message.reply(f'Введи город, ска!')
     command, text_without_command = text.split(None, maxsplit=1)
     city_dict = {
         "спб": "Санкт-Петербург",
