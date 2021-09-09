@@ -51,11 +51,13 @@ async def callback_title(callback_query: types.CallbackQuery):
     await callback_query.answer(cache_time=20)
     logging.info(f"call = {callback_query.data}")
     await callback_query.message.answer(msg, reply=False)
-    await Post.title.set()
-@dp.message_handler(state=Post.title)
-async def title_post(message: types.Message, state: FSMContext):
-    answer = message.text
-    await Post.update_data(title_post=answer)
+#    await Post.title.set()
+#@dp.message_handler(state=Post.title)
+#async def title_post(message: types.Message, state: FSMContext):
+async def title_post(message: types.Message):
+#    answer = message.text
+#    await Post.update_data(title_post=answer)
+#    logging.info(f"title = {answer}")
 
 @dp.callback_query_handler(text="text_post")
 async def callback_text(callback_query: types.CallbackQuery):

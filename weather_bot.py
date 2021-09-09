@@ -36,6 +36,14 @@ async def start_command(message: types.Message):
 async def weather_command(message: types.Message):
     text = message.text
     command, text_without_command = text.split(None, maxsplit=1)
+    city_dict = {
+        "спб": "Санкт-Петербург",
+        "питер": "Санкт-Петербург",
+        "мск": "Москва",
+        "московия": "Москва",
+        "нерезиновая": "Москва",
+    }
+    city_dicted = city_dict.get(text_without_command)
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
@@ -57,7 +65,7 @@ async def weather_command(message: types.Message):
     }
     try:
         r = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={text_without_command}&appid={open_weather_token}&units=metric"
+            f"http://api.openweathermap.org/data/2.5/weather?q={city_dicted}&appid={open_weather_token}&units=metric"
         )
         data = r.json()
 
