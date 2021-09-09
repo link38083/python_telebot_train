@@ -2,7 +2,7 @@ import os
 import logging
 import requests
 import datetime
-#import random
+import ipinfo
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 # BOT
 bot_token = os.getenv("TELETOKEN")
 open_weather_token = os.getenv("WEATHERTOKEN")
+ipinfo_token = os.getenv("IPINFO_TOKEN")
 bot = Bot(bot_token)
 dp = Dispatcher(bot)
 
@@ -36,7 +37,10 @@ async def start_command(message: types.Message):
 async def weather_command(message: types.Message):
     text = message.text
     if text == "/weather":
-        await message.reply(f'Введи город, ска!')
+        ipinfo_handler = ipinfo.getHandler(ipinfo_token)
+        ipinfo_details = ipinfo_handler.getDetails()
+        ipinfo_city = ipinfo_details.city
+        text = "/weather "+ipinfo_city
     command, text_without_command = text.split(None, maxsplit=1)
     city_dict = {
         "спб": "Санкт-Петербург",
@@ -46,8 +50,6 @@ async def weather_command(message: types.Message):
         "нерезиновая": "Москва",
     }
     city_dicted = city_dict.get(text_without_command, text_without_command)
-    no_city_dict = { Null: "no_city"}
-    no_city_dicted = no_city_dict.get(text_without_command, city_dicted)
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",

@@ -1,5 +1,8 @@
-def foo(a, b, c):
-    return c([a, b])
+import requests
+import ipinfo
 
-print(foo(1, 3, sum))
-print(foo(1, 1, set))
+access_token = '3c805bd8202418'
+handler = ipinfo.getHandler(access_token)
+details = handler.getDetails()
+#r = requests.get("http://ipinfo.io/city?Content?token=3c805bd8202418")
+print(details.city)
