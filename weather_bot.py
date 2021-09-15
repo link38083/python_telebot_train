@@ -2,7 +2,7 @@ import os
 import logging
 import requests
 import datetime
-import ipinfo
+import sqlite3
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
@@ -17,12 +17,16 @@ open_weather_token = os.getenv("WEATHERTOKEN")
 ipinfo_token = os.getenv("IPINFO_TOKEN")
 bot = Bot(bot_token)
 dp = Dispatcher(bot)
+connect = sqlite3.connect("mycity_data.db")
+cur = connect.cursor()
+print("Подключен к БД")
 
 # /start
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
     await message.reply(f"Данный бот выдает погоду в любом городе.\n"
-                        f"Введи текст в формате /weather *город*."
+                        f"Введи текст в формате /weather *город*.\n"
+                        f"Или введи /mycity *город* для установки своего дефолтного города, после чего сможешь использовать /weather"
                         )
 
 # /help
@@ -32,15 +36,29 @@ async def start_command(message: types.Message):
 #                        f"Введи текст в формате /weather *город*."
 #                       )
 
+# /city
+@dp.message_handler(commands=['mycity'])
+async def mycity(message: types.Message):
+    text = message.text
+    command, text_without_command = text.split(None, maxsplit=1)
+    try:
+        cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
+        await message.reply('Город установлен')
+    except:
+        cur.execute("UPDATE cities SET city = ? WHERE id = ?", (text_without_command, message.from_user.id))
+        await message.reply('Город заменен')
+    connect.commit()
+
 # /weather
 @dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
     text = message.text
     if text == "/weather":
-        ipinfo_handler = ipinfo.getHandler(ipinfo_token)
-        ipinfo_details = ipinfo_handler.getDetails()
-        ipinfo_city = ipinfo_details.city
-        text = "/weather "+ipinfo_city
+        cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id, ))
+#        my_city = str(cur.fetchall()).strip("[('',)]")
+        my_city = cur.fetchone()[0]
+        print(text+' '+my_city)
+        text = '/weather '+my_city
     command, text_without_command = text.split(None, maxsplit=1)
     city_dict = {
         "спб": "Санкт-Петербург",
