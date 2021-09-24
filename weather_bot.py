@@ -40,11 +40,22 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['mycity'])
 async def mycity(message: types.Message):
     text = message.text
-    command, text_without_command = text.split(None, maxsplit=1)
     try:
-        cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
-        await message.reply('Город установлен')
+        if text == "/mycity":
+            cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
+            user_city = cur.fetchone()[0]
+            if user_city == "":
+                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
+                                    f"Пока что ты бомжара")
+            else:
+                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
+                                    f"Пока твой город: "+user_city)
+        else:
+            command, text_without_command = text.split(None, maxsplit=1)
+            cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
+            await message.reply('Город установлен')
     except:
+        command, text_without_command = text.split(None, maxsplit=1)
         cur.execute("UPDATE cities SET city = ? WHERE id = ?", (text_without_command, message.from_user.id))
         await message.reply('Город заменен')
     connect.commit()
