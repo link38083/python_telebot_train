@@ -42,14 +42,17 @@ async def mycity(message: types.Message):
     text = message.text
     try:
         if text == "/mycity":
-            cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
-            user_city = cur.fetchone()[0]
-            if user_city == "":
-                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
-                                    f"Пока что ты бомжара")
-            else:
+            cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id,))
+            #user_id = cur.rowcount
+            #print('hui+'+user_id)
+            if cur.fetchone() is not None:
+                cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
+                user_city = cur.fetchone()[0]
                 await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
                                     f"Пока твой город: "+user_city)
+            else:
+                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
+                                    f"Пока что ты бомжара")
         else:
             command, text_without_command = text.split(None, maxsplit=1)
             cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
