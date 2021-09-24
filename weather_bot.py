@@ -6,7 +6,6 @@ import sqlite3
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-#from aiogram.utils.helper import Helper, HelperMode, ListItem
 
 #logging
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 # BOT
 bot_token = os.getenv("TELETOKEN")
 open_weather_token = os.getenv("WEATHERTOKEN")
-ipinfo_token = os.getenv("IPINFO_TOKEN")
 bot = Bot(bot_token)
 dp = Dispatcher(bot)
 connect = sqlite3.connect("mycity_data.db")
@@ -29,20 +27,16 @@ async def start_command(message: types.Message):
                         f"Или введи /mycity *город* для установки своего дефолтного города, после чего сможешь использовать /weather"
                         )
 
-# /help
-#@dp.message_handler(commands=['help'])
-#async def help_command(message: types.Message):
-#    await message.reply(f"Данный бот выдает погоду в любом городе.\n"
-#                        f"Введи текст в формате /weather *город*."
-#                       )
-
 city_dict = {
+        "spb": "Санкт-Петербург",
         "спб": "Санкт-Петербург",
         "питер": "Санкт-Петербург",
         "мск": "Москва",
+        "msk": "Москва",
         "московия": "Москва",
         "нерезиновая": "Москва",
     }
+
 
 # /city
 @dp.message_handler(commands=['mycity'])
@@ -54,11 +48,13 @@ async def mycity(message: types.Message):
             if cur.fetchone() is not None:
                 cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
                 user_city = cur.fetchone()[0]
-                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
-                                    f"Пока твой город: "+user_city)
+                await message.reply(f"Используй /mycity *city*, где *city* - город, который ты хочешь записать. "
+                                    f"Пока твой город: "+user_city
+                                    )
             else:
-                await message.reply(f"Используй /mycity *city*, чтоб записать город, который хочешь запомнить. "
-                                    f"Пока что ты бомжара")
+                await message.reply(f"Используй /mycity *city*, где *city* - город, который ты хочешь записать. "
+                                    f"Пока что ты бомжара"
+                                    )
         else:
             command, text_without_command = text.split(None, maxsplit=1)
             city_dicted = city_dict.get(text_without_command, text_without_command).lower()
@@ -66,8 +62,8 @@ async def mycity(message: types.Message):
                 f"http://api.openweathermap.org/data/2.5/weather?q={city_dicted}&appid={open_weather_token}&units=metric"
             )
             data = r.json()
-            print(message.from_user.id, city_dicted)
-            if data['cod'] == '404':
+            print(message.from_user.id, city_dicted, data)
+            if data['cod'] == '404' or data['cod'] == 401:
                 await message.reply(f"Иди нахуй")
             else:
                 cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
