@@ -36,6 +36,14 @@ async def start_command(message: types.Message):
 #                        f"Введи текст в формате /weather *город*."
 #                       )
 
+city_dict = {
+        "спб": "Санкт-Петербург",
+        "питер": "Санкт-Петербург",
+        "мск": "Москва",
+        "московия": "Москва",
+        "нерезиновая": "Москва",
+    }
+
 # /city
 @dp.message_handler(commands=['mycity'])
 async def mycity(message: types.Message):
@@ -43,8 +51,6 @@ async def mycity(message: types.Message):
     try:
         if text == "/mycity":
             cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id,))
-            #user_id = cur.rowcount
-            #print('hui+'+user_id)
             if cur.fetchone() is not None:
                 cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
                 user_city = cur.fetchone()[0]
@@ -55,8 +61,17 @@ async def mycity(message: types.Message):
                                     f"Пока что ты бомжара")
         else:
             command, text_without_command = text.split(None, maxsplit=1)
-            cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
-            await message.reply('Город установлен')
+            city_dicted = city_dict.get(text_without_command, text_without_command).lower()
+            r = requests.get(
+                f"http://api.openweathermap.org/data/2.5/weather?q={city_dicted}&appid={open_weather_token}&units=metric"
+            )
+            data = r.json()
+            print(message.from_user.id, city_dicted)
+            if data['cod'] == '404':
+                await message.reply(f"Иди нахуй")
+            else:
+                cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
+                await message.reply('Город установлен')
     except:
         command, text_without_command = text.split(None, maxsplit=1)
         cur.execute("UPDATE cities SET city = ? WHERE id = ?", (text_without_command, message.from_user.id))
@@ -64,24 +79,22 @@ async def mycity(message: types.Message):
     connect.commit()
 
 # /weather
+@dp.message_handler(content_types="/weather@watislove_weather_bot")
 @dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
     text = message.text
-    if text == "/weather":
-        cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id, ))
-#        my_city = str(cur.fetchall()).strip("[('',)]")
-        my_city = cur.fetchone()[0]
-        print(text+' '+my_city)
-        text = '/weather '+my_city
+    if text == "/weather" or text == "/weather@watislove_weather_bot":
+        cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id, ))
+        if cur.fetchone() is not None:
+            cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
+            my_city = cur.fetchone()[0]
+            print(text+' '+my_city)
+            text = '/weather '+my_city
+        else:
+            await message.reply(f"Задай себе город через '/mycity *city*', где *city* - твой город")
+            return text
     command, text_without_command = text.split(None, maxsplit=1)
-    city_dict = {
-        "спб": "Санкт-Петербург",
-        "питер": "Санкт-Петербург",
-        "мск": "Москва",
-        "московия": "Москва",
-        "нерезиновая": "Москва",
-    }
-    city_dicted = city_dict.get(text_without_command, text_without_command)
+    city_dicted = city_dict.get(text_without_command, text_without_command).lower()
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
