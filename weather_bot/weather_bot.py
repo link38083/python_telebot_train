@@ -147,13 +147,12 @@ async def weather_command(message: types.Message):
             wind_de = code_to_wind_degree['West']
         if (wind_degree >= 293) and (wind_degree <= 337):
             wind_de = code_to_wind_degree['North-West']
-        print(wind_de)
         date = datetime.datetime.now().strftime('%Y/%m/%d %H:%M')
 
         return await message.reply(
             f'***Погода на {date}***\n'
             f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n'
-            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind} м/c {wind_de}\n'
+            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind} м/c\n' # надо разобраться со стрелкой Север
             f'Хорошего дня, ебать'
         )
     except Exception as ex:
