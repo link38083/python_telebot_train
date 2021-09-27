@@ -11,7 +11,7 @@ from aiogram.utils import executor
 logging.basicConfig(level=logging.INFO)
 
 # BOT
-bot_token = os.getenv("TELETOKEN")
+bot_token = os.getenv("WEATHERBOT")
 open_weather_token = os.getenv("WEATHERTOKEN")
 bot = Bot(bot_token)
 dp = Dispatcher(bot)
@@ -35,15 +35,17 @@ city_dict = {
         "msk": "Москва",
         "московия": "Москва",
         "нерезиновая": "Москва",
+        "москва": "Москва"
     }
 
 
 # /city
+@dp.message_handler(content_types="/mycity@watislove_weather_bot")
 @dp.message_handler(commands=['mycity'])
 async def mycity(message: types.Message):
     text = message.text
     try:
-        if text == "/mycity":
+        if text == "/mycity" or text == "/mycity@watislove_weather_bot":
             cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id,))
             if cur.fetchone() is not None:
                 cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
@@ -115,7 +117,7 @@ async def weather_command(message: types.Message):
             f"http://api.openweathermap.org/data/2.5/weather?q={city_dicted}&appid={open_weather_token}&units=metric"
         )
         data = r.json()
-
+        print(data)
         city = data['name']
         cur_weather = data['main']['temp']
         weather_desc = data['weather'][0]['main']
@@ -129,22 +131,23 @@ async def weather_command(message: types.Message):
         wind = data['wind']['speed']
         wind_degree = data['wind']['deg']
 #        for wind_degree in code_to_wind_degree:
-        if ((wind_degree>=338)and(wind_degree<=360))or((wind_degree>0)and(wind_degree>=22)):
+        if ((wind_degree >= 338) and (wind_degree <= 360)) or ((wind_degree > 0) and (wind_degree >= 22)):
             wind_de = code_to_wind_degree['North']
-        if (wind_degree>=23)and(wind_degree<=67):
+        if (wind_degree >= 23) and (wind_degree <= 67):
             wind_de = code_to_wind_degree['North-East']
-        if (wind_degree>=68)and(wind_degree<=112):
+        if (wind_degree >= 68) and (wind_degree <= 112):
             wind_de = code_to_wind_degree['East']
-        if (wind_degree>=113)and(wind_degree<=157):
+        if (wind_degree >= 113) and (wind_degree <= 157):
             wind_de = code_to_wind_degree['South-East']
-        if (wind_degree>=158)and(wind_degree<=202):
+        if (wind_degree >= 158) and (wind_degree <= 202):
             wind_de = code_to_wind_degree['South']
-        if (wind_degree>=203)and(wind_degree<=247):
+        if (wind_degree >= 203) and (wind_degree <= 247):
             wind_de = code_to_wind_degree['South-West']
-        if (wind_degree>=248)and(wind_degree<=292):
+        if (wind_degree >= 248) and (wind_degree <= 292):
             wind_de = code_to_wind_degree['West']
-        if (wind_degree>=293)and(wind_degree<=337):
+        if (wind_degree >= 293) and (wind_degree <= 337):
             wind_de = code_to_wind_degree['North-West']
+        print(wind_de)
         date = datetime.datetime.now().strftime('%Y/%m/%d %H:%M')
 
         return await message.reply(
