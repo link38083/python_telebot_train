@@ -68,7 +68,7 @@ async def mycity(message: types.Message):
             data = r.json()
             print(message.from_user.id, city_dicted, data)
             if data['cod'] == '404' or data['cod'] == 401:
-                await message.reply(f"Иди нахуй")
+                await message.reply(f"Я не знаю такого города")
             else:
                 cur.execute("INSERT INTO cities VALUES (?, ?)", (message.from_user.id, text_without_command))
                 await message.reply('Город установлен')
@@ -134,16 +134,16 @@ async def weather_command(message: types.Message):
         pressure = data['main']['pressure'] / 1.333
         wind = data['wind']['speed']
         wind_degree = data['wind']['deg']
-        print(wind_degree, "\U00002B07")
-        #        for wind_degree in code_to_wind_degree:
+
+        print(wind_degree)
         wind_de = code_to_wind_degree[((wind_degree+22)//45 % 8)]
         date = datetime.datetime.now().strftime('%Y/%m/%d %H:%M')
 
         return await message.reply(
             f'***Погода на {date}***\n'
-            f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n'
-            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind_de} {wind} м/c\n'  # надо разобраться со стрелкой Север
-            f'Хорошего дня, ебать'
+            f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather:.0f}C°\nОщущается как: {feels_like:.0f}C°\n'
+            f'Влажность: {humidity}%\nДавление: {pressure:.0f} мм.рт.ст.\nВетер: {wind_de} {wind:.1f} м/c\n'  # надо разобраться со стрелкой Север
+            f'Хорошего дня'
         )
     except Exception as ex:
         return await message.reply('Городом ошибся')
