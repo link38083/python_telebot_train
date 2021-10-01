@@ -7,7 +7,7 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 
-#logging
+# logging
 logging.basicConfig(level=logging.INFO)
 
 # BOT
@@ -19,6 +19,7 @@ connect = sqlite3.connect("mycity_data.db")
 cur = connect.cursor()
 print("Подключен к БД")
 
+
 # /start
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
@@ -27,16 +28,17 @@ async def start_command(message: types.Message):
                         f"Или введи /mycity *город* для установки своего дефолтного города, после чего сможешь использовать /weather"
                         )
 
+
 city_dict = {
-        "spb": "Санкт-Петербург",
-        "спб": "Санкт-Петербург",
-        "питер": "Санкт-Петербург",
-        "мск": "Москва",
-        "msk": "Москва",
-        "московия": "Москва",
-        "нерезиновая": "Москва",
-        "москва": "Москва"
-    }
+    "spb": "Санкт-Петербург",
+    "спб": "Санкт-Петербург",
+    "питер": "Санкт-Петербург",
+    "мск": "Москва",
+    "msk": "Москва",
+    "московия": "Москва",
+    "нерезиновая": "Москва",
+    "москва": "Москва"
+}
 
 
 # /city
@@ -51,7 +53,7 @@ async def mycity(message: types.Message):
                 cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
                 user_city = cur.fetchone()[0]
                 await message.reply(f"Используй /mycity *city*, где *city* - город, который ты хочешь записать. "
-                                    f"Пока твой город: "+user_city
+                                    f"Пока твой город: " + user_city
                                     )
             else:
                 await message.reply(f"Используй /mycity *city*, где *city* - город, который ты хочешь записать. "
@@ -76,23 +78,25 @@ async def mycity(message: types.Message):
         await message.reply('Город заменен')
     connect.commit()
 
+
 # /weather
 @dp.message_handler(content_types="/weather@watislove_weather_bot")
 @dp.message_handler(commands=['weather'])
 async def weather_command(message: types.Message):
-    text = message.text
+    text = message.text.lower()
     if text == "/weather" or text == "/weather@watislove_weather_bot":
-        cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id, ))
+        cur.execute("SELECT id FROM cities WHERE id=?", (message.from_user.id,))
         if cur.fetchone() is not None:
             cur.execute("SELECT city FROM cities WHERE id=?", (message.from_user.id,))
             my_city = cur.fetchone()[0]
-            print(text+' '+my_city)
-            text = '/weather '+my_city
+            #print(text + ' ' + my_city)
+            text = '/weather ' + my_city
         else:
             await message.reply(f"Задай себе город через '/mycity *city*', где *city* - твой город")
             return text
     command, text_without_command = text.split(None, maxsplit=1)
-    city_dicted = city_dict.get(text_without_command, text_without_command).lower()
+    print(text)
+    city_dicted = city_dict.get(text_without_command, text_without_command)
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
@@ -103,14 +107,14 @@ async def weather_command(message: types.Message):
         "Mist": "Туман \U0001F32B"
     }
     code_to_wind_degree = {
-        "North": "\U00002B07 Северный",
-        "North-East": "\U00002199 Северо-восточный",
-        "East": "\U00002B05 Восточный",
-        "South-East": "\U00002196 Юго-восточный",
-        "South": "\U00002B06 Южный",
-        "South-West": "\U00002197 Юго-западный",
-        "West": "\U000027A1 Западный",
-        "North-West": "\U00002198 Северо-западный"
+        0: "\U00002B07 Северный",
+        1: "\U00002199 Северо-восточный",
+        2: "\U00002B05 Восточный",
+        3: "\U00002196 Юго-восточный",
+        4: "\U00002B06 Южный",
+        5: "\U00002197 Юго-западный",
+        6: "\U000027A1 Западный",
+        7: "\U00002198 Северо-западный"
     }
     try:
         r = requests.get(
@@ -127,36 +131,23 @@ async def weather_command(message: types.Message):
             wd = "Глянь в окно лучше"
         feels_like = data['main']['feels_like']
         humidity = data['main']['humidity']
-        pressure = data['main']['pressure']/1.333
+        pressure = data['main']['pressure'] / 1.333
         wind = data['wind']['speed']
         wind_degree = data['wind']['deg']
-#        for wind_degree in code_to_wind_degree:
-        if ((wind_degree >= 338) and (wind_degree <= 360)) or ((wind_degree > 0) and (wind_degree >= 22)):
-            wind_de = code_to_wind_degree['North']
-        if (wind_degree >= 23) and (wind_degree <= 67):
-            wind_de = code_to_wind_degree['North-East']
-        if (wind_degree >= 68) and (wind_degree <= 112):
-            wind_de = code_to_wind_degree['East']
-        if (wind_degree >= 113) and (wind_degree <= 157):
-            wind_de = code_to_wind_degree['South-East']
-        if (wind_degree >= 158) and (wind_degree <= 202):
-            wind_de = code_to_wind_degree['South']
-        if (wind_degree >= 203) and (wind_degree <= 247):
-            wind_de = code_to_wind_degree['South-West']
-        if (wind_degree >= 248) and (wind_degree <= 292):
-            wind_de = code_to_wind_degree['West']
-        if (wind_degree >= 293) and (wind_degree <= 337):
-            wind_de = code_to_wind_degree['North-West']
+        print(wind_degree, "\U00002B07")
+        #        for wind_degree in code_to_wind_degree:
+        wind_de = code_to_wind_degree[((wind_degree+22)//45 % 8)]
         date = datetime.datetime.now().strftime('%Y/%m/%d %H:%M')
 
         return await message.reply(
             f'***Погода на {date}***\n'
             f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather}C°\nОщущается как: {feels_like}C°\n'
-            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind} м/c\n' # надо разобраться со стрелкой Север
+            f'Влажность: {humidity}%\nДавление: {pressure:.2f} мм.рт.ст.\nВетер: {wind_de} {wind} м/c\n'  # надо разобраться со стрелкой Север
             f'Хорошего дня, ебать'
         )
     except Exception as ex:
         return await message.reply('Городом ошибся')
+
 
 if __name__ == '__main__':
     executor.start_polling(dp)
