@@ -142,7 +142,7 @@ async def weather_command(message: types.Message):
         return await message.reply(
             f'***Погода на {date}***\n'
             f'Погода в городе: {city}\n{wd}\nТемпература: {cur_weather:.0f}C°\nОщущается как: {feels_like:.0f}C°\n'
-            f'Влажность: {humidity}%\nДавление: {pressure:.0f} мм.рт.ст.\nВетер: {wind_de} {wind:.1f} м/c\n'  # надо разобраться со стрелкой Север
+            f'Влажность: {humidity}%\nДавление: {pressure:.0f} мм.рт.ст.\nВетер: {wind_de} {wind:.1f} м/c\n'
             f'Хорошего дня'
         )
     except Exception as ex:
